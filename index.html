@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ReaperHub</title>
+  <style>
+    /* Reset & base */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    body {
+      background: radial-gradient(circle at center, #121212, #0a0a0a);
+      color: #cdebb0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      user-select: none;
+    }
+
+    /* Glowing header */
+    @keyframes pulseGlow {
+      0%, 100% { text-shadow: 0 0 10px #ff2f2f, 0 0 20px #ff2f2f; color: #fff;}
+      50% { text-shadow: 0 0 25px #ff2f2f, 0 0 50px #ff2f2f; color: #fff;}
+    }
+    header h1 {
+      font-size: 3.5rem;
+      font-weight: 900;
+      color: black;
+      animation: pulseGlow 3s infinite;
+      margin-bottom: 30px;
+    }
+    header h1 span {
+      color: #bfff00;
+      text-shadow: 0 0 10px #bfff00;
+    }
+
+    /* Menu styles */
+    nav {
+      display: flex;
+      gap: 30px;
+      margin-bottom: 40px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    nav button {
+      background: transparent;
+      border: 2px solid #bfff00;
+      color: #bfff00;
+      font-weight: 700;
+      font-size: 1.2rem;
+      padding: 12px 28px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: 
+        background-color 0.3s ease,
+        color 0.3s ease,
+        box-shadow 0.3s ease;
+      user-select: none;
+    }
+    nav button:hover,
+    nav button.active {
+      background-color: #bfff00;
+      color: black;
+      box-shadow: 0 0 15px #bfff00;
+      transform: scale(1.05);
+    }
+    nav button:active {
+      transform: scale(0.95);
+      box-shadow: 0 0 8px #a3d400;
+    }
+
+    /* Content containers */
+    .content {
+      max-width: 900px;
+      width: 100%;
+      background: rgba(20, 20, 20, 0.85);
+      border-radius: 20px;
+      padding: 40px 50px;
+      box-shadow: 0 0 30px rgba(100, 255, 0, 0.3);
+      color: #d9f99d;
+      font-size: 1.15rem;
+      line-height: 1.6;
+      display: none;
+      user-select: text;
+    }
+    .content.active {
+      display: block;
+    }
+
+    /* Scripts vertical buttons */
+    #script-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      max-width: 200px;
+      margin-bottom: 30px;
+    }
+    #script-buttons button {
+      background: transparent;
+      border: 2px solid #bfff00;
+      color: #bfff00;
+      font-weight: 700;
+      font-size: 1.2rem;
+      padding: 12px 20px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: 
+        background-color 0.3s ease,
+        color 0.3s ease,
+        box-shadow 0.3s ease;
+      user-select: none;
+      text-align: center;
+    }
+    #script-buttons button:hover,
+    #script-buttons button.active {
+      background-color: #bfff00;
+      color: black;
+      box-shadow: 0 0 15px #bfff00;
+      transform: scale(1.05);
+    }
+    #script-buttons button:active {
+      transform: scale(0.95);
+      box-shadow: 0 0 8px #a3d400;
+    }
+
+    /* Script display box */
+    #script-display {
+      width: 100%;
+      max-width: 900px;
+      min-height: 150px;
+      background: #111;
+      color: #bfff00;
+      font-family: monospace, monospace;
+      font-size: 1.15rem;
+      line-height: 1.5;
+      padding: 20px;
+      border-radius: 20px;
+      box-shadow: 0 0 40px #bfff00aa;
+      user-select: text;
+      white-space: pre-wrap;
+      overflow-wrap: break-word;
+      border: none;
+      resize: none;
+      user-select: text;
+    }
+
+    /* Status container grid */
+    .status-container {
+      display: flex;
+      justify-content: center;
+      gap: 25px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+    .status-box {
+      background: #222;
+      padding: 25px 30px;
+      border-radius: 20px;
+      box-shadow: 0 0 12px rgba(120, 255, 0, 0.4);
+      color: #cdebb0;
+      flex: 1 1 210px;
+      min-width: 210px;
+      text-align: left;
+      transition: box-shadow 0.3s ease;
+    }
+    .status-box:hover {
+      box-shadow: 0 0 25px rgba(150, 255, 0, 0.8);
+    }
+    .status-box h2 {
+      color: #e2f3a2;
+      font-size: 1.4rem;
+      margin-bottom: 15px;
+      font-weight: 700;
+      text-shadow: 0 0 10px #9fc600;
+    }
+    .status-box p {
+      margin: 0;
+      font-size: 1.1rem;
+      color: #d3edbb;
+    }
+
+    /* Keys content styling */
+    #keys ul {
+      list-style: none;
+      padding-left: 0;
+    }
+    #keys li {
+      margin-bottom: 10px;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 600px) {
+      nav button {
+        flex: 1 1 45%;
+        margin-bottom: 12px;
+      }
+      .status-box {
+        flex: 1 1 100%;
+      }
+      #script-buttons {
+        max-width: 100%;
+      }
+      #script-buttons button {
+        font-size: 1rem;
+        padding: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Reaper<span>Hub</span></h1>
+  </header>
+
+  <nav>
+    <button class="active" data-target="home">Home</button>
+    <button data-target="scripts">Scripts</button>
+    <button data-target="status">Status</button>
+    <button data-target="keys">Keys</button>
+  </nav>
+
+  <!-- Home content -->
+  <section id="home" class="content active">
+    <h2>Welcome to ReaperHub</h2>
+    <p>Your ultimate hub for the best scripts, keys, and status updates.</p>
+    <p>Use the menu above to explore different sections.</p>
+  </section>
+
+  <!-- Scripts content -->
+  <section id="scripts" class="content">
+    <h2>Scripts</h2>
+    <div id="script-buttons">
+      <button class="named-script-btn" data-script="coming soon">MM2</button>
+      <button class="named-script-btn" data-script="coming soon">Gun ground ffa</button>
+      <button class="named-script-btn" data-script="coming soon">Just a baseplate</button>
+      <button class="named-script-btn" data-script="coming soon">99 days in the forest</button>
+    </div>
+    <pre id="script-display" tabindex="0" readonly>Click a button above to see the script here.</pre>
+  </section>
+
+  <!-- Status content -->
+  <section id="status" class="content">
+    <h2>Status</h2>
+    <div class="status-container">
+      <div class="status-box">
+        <h2>✅ Supported Executors</h2>
+        <p>Reversed ✅ <a href="https://discord.gg/HB2hWh9Ca7" target="_blank" rel="noopener noreferrer">[Get]</a></p>
+        <p>Delta ✅</p>
+        <p>Evon ✅</p>
+        <p>KNRL ✅</p>
+      </div>
+
+      <div class="status-box">
+        <h2>📦 Latest Update</h2>
+        <p>July 22, 2025: Creation</p>
+      </div>
+
+      <div class="status-box">
+        <h2>🔧 Script Status</h2>
+        <p>Everything is working smoothly with no known bugs.</p>
+      </div>
+
+      <div class="status-box">
+        <h2>🕹️ Working Games</h2>
+        <p>Comming soon</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Keys content -->
+  <section id="keys" class="content">
+    <h2>Keys</h2>
+    <p>Get your valid keys for all premium scripts here.</p>
+    <ul>
+      <li><strong>None</strong></li>
+      <li><strong>None</strong></li>
+      <li><strong>Beta Key:</strong> K_TEMP2025_1</li>
+    </ul>
+  </section>
+
+  <script>
+    const buttons = document.querySelectorAll('nav button');
+    const contents = document.querySelectorAll('.content');
+
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        buttons.forEach(b => b.classList.remove('active'));
+        contents.forEach(c => {
+          c.classList.remove('active');
+          // Reset Scripts tab on tab switch
+          if (c.id === 'scripts') {
+            clearActiveScriptButton();
+            scriptDisplay.textContent = 'Click a button above to see the script here.';
+          }
+        });
+
+        // Activate selected tab
+        btn.classList.add('active');
+        const target = btn.getAttribute('data-target');
+        document.getElementById(target).classList.add('active');
+      });
+    });
+
+    // Handle named script buttons
+    const namedScriptButtons = document.querySelectorAll('.named-script-btn');
+    const scriptDisplay = document.getElementById('script-display');
+
+    namedScriptButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        // Show the script in display
+        const scriptText = button.getAttribute('data-script');
+        scriptDisplay.textContent = scriptText;
+        scriptDisplay.scrollTop = 0;
+
+        // Highlight active button
+        clearActiveScriptButton();
+        button.classList.add('active');
+      });
+    });
+
+    function clearActiveScriptButton() {
+      namedScriptButtons.forEach(btn => btn.classList.remove('active'));
+    }
+  </script>
+
+</body>
+</html>
